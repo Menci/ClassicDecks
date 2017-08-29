@@ -5,7 +5,7 @@ let tmp = require('tmp-promise');
 let fs = require('fs-extra');
 let Express = require('express');
 let app = Express();
-app.listen('53457', '0.0.0.0', () => {
+app.listen('53457', '127.0.0.1', () => {
   console.log('Server listened.');
 });
 app.use(Express.static(__dirname + '/static'));
