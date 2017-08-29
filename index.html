@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>ClassicDecks by Menci</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/materialize/0.100.1/css/materialize.css" rel="stylesheet">
+  <style>
+    body {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1 0 auto;
+    }
+
+    body {
+      background: #fff;
+    }
+
+    .input-field input[type=date]:focus + label,
+    .input-field input[type=text]:focus + label,
+    .input-field input[type=email]:focus + label,
+    .input-field input[type=password]:focus + label {
+      color: #e91e63;
+    }
+
+    .input-field input[type=date]:focus,
+    .input-field input[type=text]:focus,
+    .input-field input[type=email]:focus,
+    .input-field input[type=password]:focus {
+      border-bottom: 2px solid #e91e63;
+      box-shadow: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="section"></div>
+  <main>
+  <center>
+      <h5 class="indigo-text">ClassicDecks</h5>
+      <div class="section"></div>
+
+      <div class="container">
+        <div class="z-depth-1 grey lighten-4 row" style="display: inline-block; padding: 32px 48px 0px 48px; border: 1px solid #EEE;">
+          <div class="col s12" style="width: 800px; ">
+            <div class="row">
+              <div class="inline input-field col s12" style="width: 50%; ">
+                <input type="text" id="deckname">
+                <label for="deckname" class="">套牌名称</label>
+              </div>
+              <div class="inline input-field col s12" style="width: 50%; ">
+                <input type="text" id="deckauthor">
+                <label for="deckauthor" class="">套牌作者</label>
+              </div>
+              <div class="inline input-field col s12" style="width: 100%; ">
+                <input id="deckcode" type="text">
+                <label for="deckcode" class="">套牌代码</label>
+              </div>
+            </div>
+            <center>
+              <div class="row">
+                <button class="col s12 btn btn-large waves-effect indigo" id="submit">生成套牌图片！</button>
+              </div>
+              <div class="row">
+                <div style="width: 580px; height: 200px; padding-top: 65px; display: none; " id="loading">
+
+                  <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+
+                    <div class="spinner-layer spinner-red">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+
+                    <div class="spinner-layer spinner-yellow">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+
+                    <div class="spinner-layer spinner-green">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <img id="result" class="materialboxed" src="./example.png" width="580" height="612">
+              </div>
+            </center>
+          </form>
+        </div>
+      </div>
+      <div class="section"></div>
+      <a href="https://github.com/Menci/ClassicDecks">ClassicDecks on GitHub</a>
+      <div class="section"></div>
+    </center>
+  </main>
+
+  <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/materialize/0.100.1/js/materialize.min.js"></script>
+  <script>
+  $(document).ready(function () {
+    $('.materialboxed').materialbox();
+
+    $('#submit').click(function () {
+      $('#result')[0].onload = function () {
+        $('#submit').removeAttr('disabled');
+        $('#submit').text('生成套牌图片！');
+        $('#loading').css('display', 'none');
+        $('#result').css('display', '');
+      };
+
+      $('#submit').attr('disabled', 'qwq');
+      $('#submit').text('生成中，大概需要一分钟左右，请耐心等待w~');
+      $('#loading').css('display', '');
+      $('#result').css('display', 'none');
+
+      $('#result').attr('src', '/generate?' + $.param({ deckname: $('#deckname').val(), deckauthor: $('#deckauthor').val(), deckcode: $('#deckcode').val() }));
+    });
+  });
+  </script>
+</body>
+</html>

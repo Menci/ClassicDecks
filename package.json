@@ -1,0 +1,26 @@
+{
+  "name": "classicdecks",
+  "version": "1.0.0",
+  "description": "Classic iyingdi.com deck image generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Menci/ClassicDecks.git"
+  },
+  "author": "Menci",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Menci/ClassicDecks/issues"
+  },
+  "homepage": "https://github.com/Menci/ClassicDecks#readme",
+  "dependencies": {
+    "express": "^4.15.4",
+    "fs-extra": "^4.0.1",
+    "phantom": "^4.0.5",
+    "phantomjs-prebuilt": "^2.1.15",
+    "tmp-promise": "^1.0.3"
+  }
+}

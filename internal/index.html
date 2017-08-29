@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ClassicDecks by Menci</title>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./hdd/decks.js"></script>
+    <script src="./fetch.js"></script>
+    <script src="https://cdn.staticfile.org/bluebird/3.5.0/bluebird.min.js"></script>
+
+    <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #main {
+      position: relative;
+    }
+
+    #main * {
+      position: absolute;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="main" style="width: 1160px; height: 1224px; background: #354a5f; position: relative; ">
+      <img style="left: 24px; top: 28px; width: 160px; height: 160px; " id="hero-avatar">
+      <div style="left: 14px; top: 206px; width: 558px; height: 915px; " id="cards-left"></div>
+      <div style="left: 580px; top: 206px; width: 558px; height: 915px; " id="cards-right"></div>
+
+      <div style="left: 208px; top: 12px; width: 600px; font-family: 'belwe', '经典隶变简'; color: #fff; font-size: 70px; " id="deck-name"></div>
+      <div style="left: 210px; top: 90px; width: 600px; font-family: 'Noto Sans CJK SC'; color: #fff; font-size: 35px; " id="deck-author"></div>
+      <div style="left: 210px; top: 145px; width: 600px; ">
+        <img src="./images/dust.png" style="width: 30px; top: 2px; ">
+        <div style="left: 40px; color: #fff; font-family: 'belwe'; font-size: 40px; top: -4px; " id="deck-cost">15500</div>
+        <img src="./images/dust-golden.png" style="left: 195px; width: 30px; top: 2px; ">
+        <div style="left: 235px; color: #ffe11d; font-family: 'belwe'; font-size: 40px; top: -4px; " id="deck-cost-golden">39600</div>
+      </div>
+
+      <div style="right: 30px; width: 340px; height: 165px; top: 20px; " id="cost-canvas"></div>
+    </div>
+
+    <div style="display: none; top: 0; width: 42px; height: 100%; " id="tpl-cost-canvas-item">
+      <div class="card-count" style="color: #ffd7d8; font-family: 'belwe'; font-size: 35px; text-shadow: 0 0 1px #000; text-align: center; width: 42px; -webkit-text-stroke: 1.5px #000; font-weight: bolder; "></div>
+      <div class="bar" style="left: 11px; bottom: 48px; background-color: #fff; height: 67px; width: 20px; "></div>
+      <div style="bottom: 0; height: 40px; width: 40px; ">
+        <img src="./images/mana.png" style="width: 100%; ">
+        <div style="font-family: 'belwe'; color: #fff; -webkit-text-stroke: 3px #000; font-size: 35px; font-weight: bolder; width: 100%; text-align: center; top: -3px; " class="cost"></div>
+      </div>
+    </div>
+
+    <div style="display: none; left: 0; height: 58px; width: 100%; " id="tpl-card">
+      <div style="left: 20px; top: 2px; height: calc(100% - 4px); background: #000; width: calc(100% - 20px); ">
+        <div style="left: 45px; width: 43px; height: 43px; margin-top: 6px; ">
+          <img class="card-rarity" src="./images/LOE_EPIC.svg" style="color: #fff; width: 43px; ">
+        </div>
+        <div style="right: 44px; background: #fff; width: 170px; height: 100%; overflow: hidden; ">
+          <img class="card-thumb" src="https://art.hearthstonejson.com/v1/render/latest/enUS/512x/LOE_077.png" style="left: -105px; top: -110px; width: 400px; ">
+          <div style="background: linear-gradient(to right, #000000 0%, rgba(0, 0, 0, 0) 100%); left: 0; width: 70px; height: 100%; "></div>
+        </div>
+        <div style="right: 0px; width: 44px; background: #000; height: 100%; ">
+          <div style="color: #f8e00a; font-size: 55px; font-family: 'belwe'; padding-left: 6px; padding-bottom: 15px; margin-left: 2px; margin-top: -10px; display: none; " class="card-count">1</div>
+          <div style="color: #f8e00a; font-size: 46px; font-family: 'belwe'; padding-left: 6px; padding-bottom: 15px; margin-left: -4px; margin-top: -2px; display: none; " class="card-count-legendary">★</div>
+        </div>
+        <div class="card-name" style="font-family: '经典隶变简'; color: #fff; left: 95px; top: 5px; font-size: 42px; text-shadow: 0 0 10px #000; -webkit-text-stroke: 1px #000; "></div>
+      </div>
+      <img src="./images/mana.png?" style="height: 62px; top: -2px; left: 0px; ">
+      <div class="card-cost" style="height: 62px; top: -6px; left: -7.5px; font-size: 55px; font-family: 'belwe'; color: #fff; -webkit-text-stroke: 4px #000; width: 74px; text-align: center; font-weight: bold; letter-spacing: -1px; "></div>
+    </div>
+
+    <script>
+    // From https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+    function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    $(function () {
+      function generateCardItemDiv(i, id, card) {
+        var node = document.getElementById('tpl-card').cloneNode(true);
+        node.style.top = i * 61 + 'px';
+        node.style.display = '';
+        node.id = id;
+
+        var $cardThumb = $(node).find('.card-thumb');
+        $cardThumb.attr('card-id', card.id);
+        $cardThumb.attr('src', 'https://art.hearthstonejson.com/v1/render/latest/enUS/' + (card.type === 'HERO' ? '256' : '512') + 'x/' + card.id + '.png');
+        $(node).find('.card-rarity').attr('src', './images/' + card.set + '_' + card.rarity + '.svg');
+        $(node).find('.card-cost').text(card.cost);
+        $(node).find('.card-name').text(card.name);
+        if (card.rarity === 'LEGENDARY') {
+          $(node).find('.card-count-legendary').css('display', '');
+        } else {
+          $(node).find('.card-count').css('display', '');
+          $(node).find('.card-count').html(card.counter);
+        }
+
+        return node;
+      }
+
+      $('#deck-name').html(getParameterByName('deckname'));
+      $('#deck-author').html(getParameterByName('deckauthor'));
+
+      deckDecoder().decode(getParameterByName('deckcode')).then(function (a) {
+        $('#hero-avatar').attr('src', './images/' + a.hero.playerClass + '.png');
+
+        var cards = [];
+        for (var x in a.cards) {
+          var o = a.cards[x];
+          var card = {
+            id: o.card.id,
+            name: o.card.name,
+            rarity: o.card.rarity,
+            set: o.card.set,
+            cost: o.card.cost,
+            counter: '',
+            type: o.card.type
+          };
+
+          if (o.count == 1) {
+            card.counter = 1;
+            cards.push(card);
+          } else {
+            cards.push(card);
+            card = $.extend(true, {}, card);
+            card.counter = 2;
+            cards.push(card);
+          }
+        }
+
+        var cardsLeft = document.getElementById('cards-left'), cardsRight = document.getElementById('cards-right');
+        cardsLeft.innerHTML = cardsRight.innerHTML = '';
+
+        for (var i = 0; i < 15; i++) if (i < cards.length) cardsLeft.appendChild(generateCardItemDiv(i, i, cards[i]));
+        for (var i = 0; i < 15; i++) if (i + 15 < cards.length) cardsRight.appendChild(generateCardItemDiv(i, i + 15, cards[i + 15]));
+
+        var dust = 0, dustGolden = 0, costCount = [0, 0, 0, 0, 0, 0, 0, 0];
+        for (var i = 0; i < 30; i++) {
+          if (i < cards.length) {
+            var card = cards[i];
+            if (card.rarity === 'COMMON') dust += 40, dustGolden += 400;
+            if (card.rarity === 'RARE') dust += 100, dustGolden += 800;
+            if (card.rarity === 'EPIC') dust += 400, dustGolden += 1600;
+            if (card.rarity === 'LEGENDARY') dust += 1600, dustGolden += 3200;
+            costCount[card.cost > 7 ? 7 : card.cost]++;
+          }
+        }
+
+        $('#deck-cost').text(dust);
+        $('#deck-cost-golden').text(dustGolden);
+
+        var max = 0;
+        for (var i = 0; i <= 7; i++) {
+          max = Math.max(max, costCount[i]);
+        }
+        if (isNaN(max) || !isFinite(max) || max === 0) max = 1;
+
+        $('#cost-canvas').html('');
+        for (var i = 0; i <= 7; i++) {
+          var left = i * 42;
+          var node = $('#tpl-cost-canvas-item')[0].cloneNode(true);
+          node.style.display = '';
+          node.style.left = left + 'px';
+          $(node).find('.card-count').html(costCount[i]);
+          $(node).find('.bar').css('height', (costCount[i] / max * 65 + 2) + 'px');
+          $(node).find('.cost').html(i < 7 ? i : (i + '<span style="font-size: 27px; ">+</span>'));
+          document.getElementById('cost-canvas').appendChild(node);
+        }
+
+        var unloadedImagesCount = 0, images = document.images;
+        for (var i = 0; i < document.images.length; i++) {
+          var img = images[i];
+          if (!img.complete) {
+            console.log(img);
+            unloadedImagesCount++;
+            img.onload = checkImagesLoaded;
+          }
+        }
+
+        if (!unloadedImagesCount) {
+          window.callPhantom(null);
+        }
+
+        function checkImagesLoaded () {
+          console.log('load!');
+          if (!--unloadedImagesCount) window.callPhantom(null);
+          console.log(unloadedImagesCount);
+        }
+      });
+    });
+    </script>
+  </body>
+</html>

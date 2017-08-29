@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Hearthstone Deck Decoder</title>
+		<script type="text/javascript" src="decks.js"></script>
+		<script type="text/javascript">
+var decoder = deckDecoder();
+
+var showDeck = function() {
+	var encoded = document.getElementById('deckString').value;
+	decoder.decode(encoded).then((deck) => {
+		document.getElementById("type").innerText = deck.type + ' Deck';
+		document.getElementById("hero").innerText = deck.hero.name + ' (' + deck.heroClass + ')';
+		var list = document.getElementById("cards");
+		list.innerHTML = "";
+		for (var i = 0; i < deck.cards.length; i++) {
+			var card = deck.cards[i].card;
+			var row = document.createElement("li");
+			var image = document.createElement("img");
+			image.setAttribute("src", "http://media.services.zam.com/v1/media/byName/hs/cards/enus/animated/" + card.id+ "_premium.gif");
+			row.appendChild(image);
+			row.appendChild(document.createTextNode(deck.cards[i].count + "x (" +card.cost + ") "+ card.name));
+			list.appendChild(row);
+		}
+	});
+};
+		</script>
+		<style>
+			li>img {
+				position: absolute;
+				left: 200px;
+				display: none;
+			}
+			li:hover>img {
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<div>Example: AAEBAf0EBMkD7QW4CJKsAg37AbsClQOrBLQE5gSWBbkGvAjjEboWgbICmMQCAA==</div>
+		<input id="deckString" type="text" size="50"/><button onclick="showDeck()" type="submit">Show</button>
+		<br /><br />
+		<div id="type"></div>
+		<div id="hero"></div>
+		<ul id="cards"></ul>
+	</body>
+</html>
